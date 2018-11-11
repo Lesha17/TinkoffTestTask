@@ -1,0 +1,45 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="https://vk.com/madness_mimr/com/lmm/TinkoffTestTask"
+           targetNamespace="https://vk.com/madness_mimr/com/lmm/TinkoffTestTask" elementFormDefault="qualified">
+
+
+    <xs:element name="FindNumberRequest">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="number" type="xs:integer"></xs:element>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="FindNumberResponse">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="Result" type="tns:Result"></xs:element>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+
+    
+    <xs:complexType name="Result">
+        <xs:all>
+            <xs:element name="code" type="tns:Code"></xs:element>
+            <xs:element name="fileNames" type="tns:FileNamesList"></xs:element>
+            <xs:element name="error" type="xs:string" minOccurs="0"></xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:simpleType name="Code">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="00.Result.OK"></xs:enumeration>
+            <xs:enumeration value="01.Result.NotFound"></xs:enumeration>
+            <xs:enumeration value="02.Result.Error"></xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="FileNamesList">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="fileName" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
