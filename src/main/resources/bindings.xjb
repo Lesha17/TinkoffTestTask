@@ -1,0 +1,16 @@
+<jxb:bindings
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+        version="2.1">
+    <jxb:bindings schemaLocation="result.xsd">
+        <jxb:bindings node="//xs:simpleType[@name='Code']/xs:restriction/xs:enumeration[@value='00.Result.OK']">
+            <jxb:typesafeEnumMember name="OK"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:simpleType[@name='Code']/xs:restriction/xs:enumeration[@value='01.Result.NotFound']">
+            <jxb:typesafeEnumMember name="NOT_FOUND"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:simpleType[@name='Code']/xs:restriction/xs:enumeration[@value='02.Result.Error']">
+            <jxb:typesafeEnumMember name="ERROR"/>
+        </jxb:bindings>
+    </jxb:bindings>
+</jxb:bindings>

@@ -2,6 +2,7 @@ package com.lmm.tinkoff.task.test;
 
 
 import com.lmm.FindNumberEndpoint;
+import com.lmm.WebServiceConfig;
 import com.lmm.tinkoff.task.FindNumberRequest;
 import com.lmm.tinkoff.task.ObjectFactory;
 import org.junit.Before;
@@ -25,7 +26,7 @@ import java.math.BigInteger;
 import static org.springframework.ws.test.server.ResponseMatchers.noFault;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { FindNumberEndpoint.class })
+@ContextConfiguration(classes = {WebServiceConfig.class, FindNumberEndpoint.class})
 public class FindNumberTest {
 
     @Autowired

@@ -29,6 +29,17 @@
             <artifactId>wsdl4j</artifactId>
             <version>1.6.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>2.0.4.RELEASE</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.ws</groupId>
@@ -79,8 +90,11 @@
                 </executions>
                 <configuration>
                     <sources>
-                        <source>${project.basedir}/src/main/resources</source>
+                        <source>${project.basedir}/src/main/resources/result.xsd</source>
                     </sources>
+                    <xjbSources>
+                        <source>${project.basedir}/src/main/resources/bindings.xjb</source>
+                    </xjbSources>
                     <outputDirectory>${project.basedir}/src/main/java-gen</outputDirectory>
                     <packageName>com.lmm.tinkoff.task</packageName>
                 </configuration>
