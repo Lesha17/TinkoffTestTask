@@ -1,10 +1,10 @@
 package com.lmm.tinkoff.task.test;
 
 
-import com.lmm.FindNumberEndpoint;
-import com.lmm.WebServiceConfig;
+import com.lmm.tinkoff.task.FindNumberEndpoint;
 import com.lmm.tinkoff.task.FindNumberRequest;
 import com.lmm.tinkoff.task.ObjectFactory;
+import com.lmm.tinkoff.task.WebServiceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,7 +1,5 @@
-package com.lmm;
+package com.lmm.tinkoff.task;
 
-import com.lmm.tinkoff.task.FileNamesList;
-import com.lmm.tinkoff.task.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;

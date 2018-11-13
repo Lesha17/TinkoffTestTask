@@ -1,6 +1,7 @@
-package com.lmm;
+package com.lmm.tinkoff.task;
 
 import org.postgresql.Driver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,8 @@ import org.springframework.xml.xsd.SimpleXsdSchema;
 import org.springframework.xml.xsd.XsdSchema;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
 
 @EnableWs
 @Configuration
@@ -24,6 +27,14 @@ import javax.sql.DataSource;
 public class WebServiceConfig extends WsConfigurerAdapter {
 
     public static final String NAMESPACE_URI = "https://vk.com/madness_mimr/com/lmm/TinkoffTestTask";
+    public static final String JDBC_URL_PROPERTY_NAME = "com.lmm.tinkoff.task.jdbc.url";
+    public static final String FILES_LIST_PROPERTY_NAME = "com.lmm.tinkoff.task.files_list";
+
+    @Value("${" + JDBC_URL_PROPERTY_NAME + "}")
+    private String jdbcUrl;
+
+    @Value("${" + FILES_LIST_PROPERTY_NAME + "}")
+    private String filesListLocation;
 
     @Bean
     public ServletRegistrationBean messageDispatcherServlet(ApplicationContext applicationContext) {
@@ -63,5 +74,20 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
+    }
+
+    @Bean
+    public FilesProvider filesProvider() {
+        return new FileDefinedFilesProvider(new File(filesListLocation));
+    }
+
+    @Bean
+    public ScannerProvider scannerProvider() {
+        return new DefaultScannerProvider();
+    }
+
+    @Bean
+    public NumberSearcher numberSearcher(FilesProvider filesProvider, ScannerProvider scannerProvider) throws IOException {
+        return new FilesNumberSearcher(filesProvider.getFiles(), scannerProvider);
     }
 }

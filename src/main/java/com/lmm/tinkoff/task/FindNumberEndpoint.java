@@ -1,6 +1,5 @@
-package com.lmm;
+package com.lmm.tinkoff.task;
 
-import com.lmm.tinkoff.task.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;

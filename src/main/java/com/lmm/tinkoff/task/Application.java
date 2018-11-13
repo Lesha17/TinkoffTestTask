@@ -1,4 +1,4 @@
-package com.lmm;
+package com.lmm.tinkoff.task;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

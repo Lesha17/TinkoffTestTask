@@ -4,13 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.lmm</groupId>
+    <groupId>com.lmm.tinkoff.task</groupId>
     <artifactId>tinkoff-test-task</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jdbc.url>jdbc:postgresql://localhost:5432/tinkoff_task</jdbc.url>
+        <source-files-list>${user.home}/TinkoffTestTask/filesList.txt</source-files-list>
     </properties>
 
     <dependencies>
@@ -75,6 +77,22 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <com.lmm.tinkoff.task.jdbc.url>${jdbc.url}</com.lmm.tinkoff.task.jdbc.url>
+                        <com.lmm.tinkoff.task.files_list>${source-files-list}</com.lmm.tinkoff.task.files_list>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <com.lmm.tinkoff.task.jdbc.url>${jdbc.url}</com.lmm.tinkoff.task.jdbc.url>
+                        <com.lmm.tinkoff.task.files_list>${source-files-list}</com.lmm.tinkoff.task.files_list>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
