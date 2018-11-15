@@ -13,6 +13,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <jdbc.url>jdbc:postgresql://localhost:5432/tinkoff_task</jdbc.url>
         <source-files-list>${user.home}/TinkoffTestTask/filesList.txt</source-files-list>
+        <index-dir>${user.home}/TinkoffTestTask/Index</index-dir>
     </properties>
 
     <dependencies>
@@ -81,6 +82,7 @@
                     <systemPropertyVariables>
                         <com.lmm.tinkoff.task.jdbc.url>${jdbc.url}</com.lmm.tinkoff.task.jdbc.url>
                         <com.lmm.tinkoff.task.files_list>${source-files-list}</com.lmm.tinkoff.task.files_list>
+                        <com.lmm.tinkoff.task.index_dir>${index-dir}</com.lmm.tinkoff.task.index_dir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -91,6 +93,7 @@
                     <systemPropertyVariables>
                         <com.lmm.tinkoff.task.jdbc.url>${jdbc.url}</com.lmm.tinkoff.task.jdbc.url>
                         <com.lmm.tinkoff.task.files_list>${source-files-list}</com.lmm.tinkoff.task.files_list>
+                        <com.lmm.tinkoff.task.index_dir>${index-dir}</com.lmm.tinkoff.task.index_dir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

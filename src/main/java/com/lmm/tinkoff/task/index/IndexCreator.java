@@ -18,25 +18,29 @@ public class IndexCreator {
 
     public void createIndex(File input, File output) throws IOException {
 
-        List<BigInteger> numbersFromInput = readFile(input);
-        numbersFromInput.sort(BigInteger::compareTo);
+        int[] numbersFromInput = readFile(input);
+        Arrays.sort(numbersFromInput);
 
-        int partsCount = getOptimalPartsCount(numbersFromInput.size());
-        int partSize = numbersFromInput.size() / partsCount + 1;
+        int partsCount = getOptimalPartsCount(numbersFromInput.length);
+        int partSize = numbersFromInput.length / partsCount + 1;
 
         long mapOffset = 0;
-        SortedMap<BigInteger, Long> partsOffsets = new TreeMap<>();
+        SortedMap<Integer, Long> partsOffsets = new TreeMap<>();
 
         try(CountingOutputStream outputStream = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(output), 1024 * 1024))) {
             byte[] emptyBytesForMapOffset = new byte[8];
             outputStream.write(emptyBytesForMapOffset);
 
-                for(int partStartIndex = 0; partStartIndex < numbersFromInput.size(); partStartIndex += partSize) {
+                for(int partStartIndex = 0; partStartIndex < numbersFromInput.length; partStartIndex += partSize) {
 
-                    int partEndIndex = Math.min(partStartIndex + partSize, numbersFromInput.size());
-                    List<BigInteger> part = new ArrayList<>(numbersFromInput.subList(partStartIndex, partEndIndex));
+                    int partEndIndex = Math.min(partStartIndex + partSize, numbersFromInput.length);
 
-                    partsOffsets.put(part.get(0), outputStream.getByteCount());
+                    int[] part = new int[partEndIndex - partStartIndex];
+                    for(int i = partStartIndex; i < partEndIndex; ++i) {
+                        part[i - partStartIndex] = numbersFromInput[i];
+                    }
+
+                    partsOffsets.put(part[0], outputStream.getByteCount());
                     writeObject(outputStream, part);
                 }
 
@@ -47,6 +51,8 @@ public class IndexCreator {
         try(RandomAccessFile randomAccessFile = new RandomAccessFile(output,"rw")) {
             randomAccessFile.writeLong(mapOffset);
         }
+
+        System.out.println("Indexed " + input + " to " + output);
     }
 
     protected int getOptimalPartsCount(int numbersCount) {
@@ -62,21 +68,27 @@ public class IndexCreator {
         outputStream.write(byteArrayOutputStream.toByteArray());
     }
 
-    // Memory required to store integers from file of size s, where each number has n decimal digits, is
-    // (s / (n+1)) * (n * log(10) / log(2)) / 8 bytes.
-    private List<BigInteger> readFile(File input) throws IOException {
-        List<BigInteger> result = new ArrayList<>();
+    private int[] readFile(File input) throws IOException {
+
+        int capacity = 1024;
+        int size = 0;
+        int[] result = new int[capacity];
 
         try(InputStream inputStream = new FileInputStream(input)) {
 
             Scanner scanner = scannerProvider.getScanner(inputStream);
 
-            while (scanner.hasNextBigInteger()) {
-                BigInteger n = scanner.nextBigInteger();
-                result.add(n);
+            while (scanner.hasNextInt()) {
+                int n = scanner.nextInt();
+
+                result[size++] = n;
+                if(size == capacity) {
+                    capacity *= 2;
+                    result = Arrays.copyOf(result, capacity);
+                }
             }
 
-            return result;
+            return Arrays.copyOf(result, size);
 
         }
     }

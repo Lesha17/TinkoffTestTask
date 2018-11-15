@@ -18,10 +18,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -65,34 +62,38 @@ public class IndexTest {
 
         indexCreator.createIndex(inputFile, indexFile);
 
-        SortedMap<BigInteger, Long> partsOffsets = indexReader.readPartsOffsets(indexFile);
+        SortedMap<Integer, Long> partsOffsets = indexReader.readPartsOffsets(indexFile);
         Assert.assertFalse(partsOffsets.isEmpty());
 
-        BigInteger someBigInteger = partsOffsets.firstKey().multiply(BigInteger.valueOf(2)).divide(BigInteger.valueOf(3))
-                .add(partsOffsets.lastKey().divide(BigInteger.valueOf(3)));
+        int someNumber = (partsOffsets.firstKey() * 2 / 3) +
+                (partsOffsets.lastKey() / 3);
 
-        BigInteger key;
-        if(partsOffsets.containsKey(someBigInteger)) {
-            key = someBigInteger;
+        Integer key;
+        if(partsOffsets.containsKey(someNumber)) {
+            key = someNumber;
         } else {
-            key = partsOffsets.headMap(someBigInteger).lastKey();
+            key = partsOffsets.headMap(someNumber).lastKey();
         }
 
         Long partOffset = partsOffsets.get(key);
 
-        List<BigInteger> numbers = indexReader.readPart(indexFile, partOffset);
-        System.out.println(numbers.size());
-        System.out.println(someBigInteger);
+        int[] numbers = indexReader.readPart(indexFile, partOffset);
+        System.out.println(numbers.length);
+        System.out.println(someNumber);
         System.out.println(numbers);
 
-        Assert.assertFalse(numbers.isEmpty());
+        Assert.assertFalse(numbers.length == 0);
         assertSorted(numbers);
-        Assert.assertTrue(numbers.get(0).compareTo(someBigInteger) <= 0);
-        Assert.assertTrue(numbers.get(numbers.size() - 1).compareTo(someBigInteger) >= 0);
+        Assert.assertTrue(numbers[0] <= someNumber);
+        Assert.assertTrue(numbers[numbers.length - 1] >= someNumber);
     }
 
-    private void assertSorted(List<BigInteger> numbers) {
-        Assert.assertEquals("Numbers must be sorted", numbers.stream().sorted().collect(Collectors.toList()), numbers);
+    private void assertSorted(int[] numbers) {
+
+        int[] sortedArr = Arrays.copyOf(numbers, numbers.length);
+        Arrays.sort(sortedArr);
+
+        Assert.assertArrayEquals("Numbers must be sorted", sortedArr, numbers);
     }
 
 }

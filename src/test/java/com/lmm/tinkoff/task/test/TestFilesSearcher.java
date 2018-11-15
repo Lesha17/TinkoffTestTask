@@ -39,8 +39,6 @@ public class TestFilesSearcher {
     @Before
     public void init() throws Exception {
         files = filesProvider.getFiles();
-        ((FilesNumberSearcher) searcher).setThreadsCount(FILES_COUNT);
-        ((FilesNumberSearcher) searcher).setChunksCount(CHUNKS_COUNT);
     }
 
     @Test

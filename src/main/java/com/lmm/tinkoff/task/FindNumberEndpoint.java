@@ -7,6 +7,8 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.List;
 
 @Endpoint
 public class FindNumberEndpoint {
@@ -14,24 +16,39 @@ public class FindNumberEndpoint {
     private ObjectFactory objectFactory = new ObjectFactory();
 
     private ResultDAO resultDAO;
+    private NumberSearcher numberSearcher;
 
     @Autowired
-    public FindNumberEndpoint(ResultDAO resultDAO) {
+    public FindNumberEndpoint(ResultDAO resultDAO, NumberSearcher numberSearcher) {
         this.resultDAO = resultDAO;
+        this.numberSearcher = numberSearcher;
     }
 
     @PayloadRoot(namespace = WebServiceConfig.NAMESPACE_URI, localPart = "FindNumberRequest")
     @ResponsePayload
     public FindNumberResponse findNumber(@RequestPayload FindNumberRequest request) {
-        BigInteger number = request.getNumber();
+        int number = request.getNumber().intValue();
+        if(!BigInteger.valueOf(number).equals(request.getNumber())) {
+            throw new IllegalArgumentException("Given number is too large");
+        }
+
+        Collection<String> foundIn = numberSearcher.findNumber(number);
 
         Result result = objectFactory.createResult();
-        result.setCode(Code.NOT_FOUND);
+        if(!foundIn.isEmpty()) {
+            result.setCode(Code.OK);
+
+            FileNamesList fileNamesList = objectFactory.createFileNamesList();
+            fileNamesList.getFileName().addAll(foundIn);
+            result.setFileNames(fileNamesList);
+        } else {
+            result.setCode(Code.NOT_FOUND);
+        }
 
         FindNumberResponse response = objectFactory.createFindNumberResponse();
         response.setResult(result);
 
-        resultDAO.insertResult(number, result);
+        resultDAO.insertResult(BigInteger.valueOf(number), result);
 
         return response;
     }

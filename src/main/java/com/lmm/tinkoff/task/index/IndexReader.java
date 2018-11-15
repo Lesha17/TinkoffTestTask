@@ -8,18 +8,22 @@ import java.util.SortedMap;
 
 public class IndexReader {
 
-    public SortedMap<BigInteger, Long> readPartsOffsets(File index) throws IOException {
+    public SortedMap<Integer, Long> readPartsOffsets(File index) throws IOException {
+        long mapOffset = readMapOffset(index);
 
-        long mapOffset;
-        try(RandomAccessFile randomAccessFile = new RandomAccessFile(index, "r")) {
-            mapOffset = randomAccessFile.readLong();
+        if(mapOffset <= 0) {
+            throw new IllegalArgumentException("Index is not completed");
         }
 
-        return (SortedMap<BigInteger, Long>) read(index, mapOffset);
+        return (SortedMap<Integer, Long>) read(index, mapOffset);
     }
 
-    public List<BigInteger> readPart(File index, long partOffset) throws IOException {
-        return (List<BigInteger>) read(index, partOffset);
+    public int[] readPart(File index, long partOffset) throws IOException {
+        return (int[]) read(index, partOffset);
+    }
+
+    public boolean isIndexCompleted(File index) throws IOException {
+        return readMapOffset(index) > 0;
     }
 
     private Object read(File file, long offset) throws IOException {
@@ -32,6 +36,16 @@ public class IndexReader {
         }
         catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private long readMapOffset(File file) throws IOException {
+        try(RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+            if(randomAccessFile.length() < 8) {
+                return -1;
+            }
+
+            return randomAccessFile.readLong();
         }
     }
 
