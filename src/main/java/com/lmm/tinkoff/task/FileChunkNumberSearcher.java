@@ -3,6 +3,8 @@ package com.lmm.tinkoff.task;
 import org.apache.commons.io.input.CountingInputStream;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,31 +32,32 @@ public class FileChunkNumberSearcher implements NumberSearcher {
 
     @Override
     public Collection<String> findNumber(int number) {
-        try(CountingInputStream inputStream = new CountingInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+
+        ByteBuffer buffer;
+        try(FileInputStream fileInputStream = new FileInputStream(file);
+            FileChannel channel = fileInputStream.getChannel()) {
+            buffer = ByteBuffer.allocate((int)file.length());
+
+            channel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try(InputStream inputStream = new ByteArrayInputStream(buffer.array())) {
 
             Scanner scanner = scannerProvider.getScanner(inputStream);
 
-            if(chunkNumber > 0) {
+            System.out.println("File: " + resourceName );
 
-                // Deal with situation when number chunk start position splits number
-                inputStream.skip(chunkSize * chunkNumber - 1);
-                inputStream.mark(4);
-                int c = inputStream.read();
-                if(Character.isDigit(c)) {
-                    inputStream.reset();
-                    scanner.nextInt();
-                }
-            }
-
-            System.out.println("File: " + resourceName + ", Byte count: " + inputStream.getByteCount());
-
-            while (scanner.hasNextInt() && inputStream.getByteCount() < chunkSize * (chunkNumber + 1)) {
+            while (scanner.hasNextInt() ) {
                 int n = scanner.nextInt();
                 if(n == number) {
+                    System.out.println("Found");
                     return Arrays.asList(resourceName);
                 }
             }
 
+            System.out.println("Not found");
             return Collections.emptyList();
 
         } catch (IOException e) {

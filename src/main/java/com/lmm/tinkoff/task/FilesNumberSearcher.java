@@ -37,21 +37,11 @@ public class FilesNumberSearcher implements NumberSearcher {
     @Override
     public Collection<String> findNumber(int number) {
 
-        ForkJoinPool pool = new ForkJoinPool(threadsCount);
-
-        try {
-
-           return pool.submit(() ->
-
-                resources.entrySet().parallelStream()
+           return
+                resources.entrySet().stream()
                     .map(e -> new SingleFileNumberSearcher(e.getValue(), e.getKey(), scannerProvider, chunksCount))
                     .flatMap(searcher -> searcher.findNumber(number).stream())
-                    .collect(Collectors.toList()))
-            .get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pool.shutdown();
-        }
+                    .collect(Collectors.toList());
+
     }
 }

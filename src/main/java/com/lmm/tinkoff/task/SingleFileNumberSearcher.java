@@ -38,8 +38,6 @@ public class SingleFileNumberSearcher implements NumberSearcher {
     @Override
     public Collection<String> findNumber(int number) {
 
-        ForkJoinPool forkJoinPool = new ForkJoinPool(chunksCount);
-
         try {
             long fileSize = Files.size(file.toPath());
             long chunkSize = fileSize / chunksCount + 1;
@@ -49,17 +47,13 @@ public class SingleFileNumberSearcher implements NumberSearcher {
                 chunkSearchers.add(new FileChunkNumberSearcher(file, resourceName, scannerProvider, chunkSize, i));
             }
 
-            return forkJoinPool.submit(() -> chunkSearchers.parallelStream()
+            return chunkSearchers.stream()
                         .map(numberSearcher -> numberSearcher.findNumber(number))
                         .filter(result -> !result.isEmpty())
-                        .findAny().orElse(Collections.emptyList()))
-                    .get();
+                        .findAny().orElse(Collections.emptyList());
         }
-        catch (InterruptedException | ExecutionException | IOException e) {
+        catch ( IOException e) {
             throw new RuntimeException(e);
-        }
-        finally {
-            forkJoinPool.shutdown();
         }
     }
 }
