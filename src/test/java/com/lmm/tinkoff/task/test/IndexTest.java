@@ -1,7 +1,6 @@
 package com.lmm.tinkoff.task.test;
 
-import com.lmm.tinkoff.task.FilesProvider;
-import com.lmm.tinkoff.task.ScannerProvider;
+import com.lmm.tinkoff.task.search.FilesProvider;
 import com.lmm.tinkoff.task.WebServiceConfig;
 import com.lmm.tinkoff.task.index.IndexCreator;
 import com.lmm.tinkoff.task.index.IndexReader;
@@ -15,30 +14,29 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.SortedMap;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = WebServiceConfig.class)
 public class IndexTest {
 
-    private static final int SOME_FILE_INDEX = 5;
+    private static final int SOME_FILE_INDEX = 1;
     private static final String INDEX_SUFFIX = "ttIndex";
 
     @Autowired
     private FilesProvider filesProvider;
 
     @Autowired
-    private ScannerProvider scannerProvider;
+    private IndexCreator indexCreator;
+
+    @Autowired
+    private IndexReader indexReader;
 
     private File inputFile;
     private File indexFile;
-
-    private IndexCreator indexCreator;
-    private IndexReader indexReader;
 
     @Before
     public void init() throws Exception {
@@ -47,9 +45,6 @@ public class IndexTest {
 
         indexFile = Files.createTempFile(inputFile.getName(), INDEX_SUFFIX).toFile();
         indexFile.deleteOnExit();
-
-        indexCreator = new IndexCreator(scannerProvider);
-        indexReader = new IndexReader();
     }
 
     @After
@@ -69,7 +64,7 @@ public class IndexTest {
                 (partsOffsets.lastKey() / 3);
 
         Integer key;
-        if(partsOffsets.containsKey(someNumber)) {
+        if (partsOffsets.containsKey(someNumber)) {
             key = someNumber;
         } else {
             key = partsOffsets.headMap(someNumber).lastKey();
@@ -78,9 +73,6 @@ public class IndexTest {
         Long partOffset = partsOffsets.get(key);
 
         int[] numbers = indexReader.readPart(indexFile, partOffset);
-        System.out.println(numbers.length);
-        System.out.println(someNumber);
-        System.out.println(numbers);
 
         Assert.assertFalse(numbers.length == 0);
         assertSorted(numbers);

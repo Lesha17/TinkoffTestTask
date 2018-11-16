@@ -10,10 +10,6 @@ import java.util.Random;
 
 public class RangedFileContentGenerator implements FileContentGenerator {
 
-    public static final int DEFAULT_ORIGIN = 0;
-    public static final int DEFAULT_BOUND = 1024 * 1024 * 1024;
-    public static final long DEFAULT_FILE_SIZE = 128 * 1024 * 1024;
-
     private int origin;
     private int bound;
     private Random random = new Random();
@@ -28,14 +24,6 @@ public class RangedFileContentGenerator implements FileContentGenerator {
         this.fileSize = fileSize;
     }
 
-    public RangedFileContentGenerator(int origin, int bound) {
-        this(origin, bound, DEFAULT_FILE_SIZE);
-    }
-
-    public RangedFileContentGenerator() {
-        this(DEFAULT_ORIGIN, DEFAULT_BOUND);
-    }
-
     @Override
     public void fillContent(File file) throws IOException {
 
@@ -48,18 +36,6 @@ public class RangedFileContentGenerator implements FileContentGenerator {
                 printWriter.write(number + ",");
             }
         }
-    }
-
-    public int getOrigin() {
-        return origin;
-    }
-
-    public int getBound() {
-        return bound;
-    }
-
-    public long getFileSize() {
-        return fileSize;
     }
 
     protected int nextNumber(long currentSize) {

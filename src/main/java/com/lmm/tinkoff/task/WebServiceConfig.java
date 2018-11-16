@@ -1,17 +1,23 @@
 package com.lmm.tinkoff.task;
 
 import com.lmm.tinkoff.task.index.*;
+import com.lmm.tinkoff.task.search.FileDefinedFilesProvider;
+import com.lmm.tinkoff.task.search.FilesProvider;
+import com.lmm.tinkoff.task.search.IndexedNumberSearcher;
+import com.lmm.tinkoff.task.search.NumberSearcher;
 import org.postgresql.Driver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.ws.config.annotation.EnableWs;
 import org.springframework.ws.config.annotation.WsConfigurerAdapter;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
@@ -24,12 +30,13 @@ import java.io.File;
 import java.io.IOException;
 
 @EnableWs
-@EnableScheduling
 @Configuration
 @ComponentScan
+@PropertySource("classpath:application.properties")
 public class WebServiceConfig extends WsConfigurerAdapter {
 
     public static final String NAMESPACE_URI = "https://vk.com/madness_mimr/com/lmm/TinkoffTestTask";
+
     public static final String JDBC_URL_PROPERTY_NAME = "com.lmm.tinkoff.task.jdbc.url";
     public static final String FILES_LIST_PROPERTY_NAME = "com.lmm.tinkoff.task.files_list";
     public static final String INDEX_FILES_PROPERTY_NAME = "com.lmm.tinkoff.task.index_dir";
@@ -42,6 +49,11 @@ public class WebServiceConfig extends WsConfigurerAdapter {
 
     @Value("${" + INDEX_FILES_PROPERTY_NAME + "}")
     private String indexFilesLocation;
+
+    @Bean
+    public Logger logger() {
+        return LoggerFactory.getLogger("application");
+    }
 
     @Bean
     public ServletRegistrationBean messageDispatcherServlet(ApplicationContext applicationContext) {
@@ -89,18 +101,18 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     }
 
     @Bean
-    public IndexProvider indexProvider() {
+    public IndexFilesProvider indexProvider() {
         File indexFilesDir = new File(indexFilesLocation);
         if (!indexFilesDir.exists()) {
             indexFilesDir.mkdirs();
         }
 
-        return new IndexProvider(indexFilesDir);
+        return new IndexFilesProvider(indexFilesDir);
     }
 
     @Bean
-    public IndexCreator indexCreator(ScannerProvider scannerProvider) {
-        return new IndexCreator(scannerProvider);
+    public IndexCreator indexCreator() {
+        return new IndexCreator();
     }
 
     @Bean
@@ -109,17 +121,12 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     }
 
     @Bean
-    public Indexer indexer(FilesProvider filesProvider, IndexProvider indexProvider, IndexCreator indexCreator, IndexReader indexReader) {
-        return new BlockingIndexer(filesProvider, indexProvider, indexCreator, indexReader);
+    public Indexer indexer(FilesProvider filesProvider, IndexFilesProvider indexFilesProvider, IndexCreator indexCreator, IndexReader indexReader) {
+        return new BlockingIndexer(filesProvider, indexFilesProvider, indexCreator, indexReader);
     }
 
     @Bean
-    public ScannerProvider scannerProvider() {
-        return new DefaultScannerProvider();
-    }
-
-    @Bean
-    public NumberSearcher numberSearcher(FilesProvider filesProvider, IndexProvider indexProvider, IndexReader indexReader) throws IOException {
-        return new IndexedNumberSearcher(filesProvider, indexProvider, indexReader);
+    public NumberSearcher numberSearcher(FilesProvider filesProvider, IndexFilesProvider indexFilesProvider, IndexReader indexReader) throws IOException {
+        return new IndexedNumberSearcher(filesProvider, indexFilesProvider, indexReader);
     }
 }

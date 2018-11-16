@@ -9,18 +9,19 @@ public class FilesGenerator {
 
     private static final String FILENAME_BASE = "SourceFile";
     private static final String EXTENSION = ".txt";
-    private static final int FILES_COUNT = 20;
 
     private File filesDir;
+    private int filesCount;
 
-    public FilesGenerator(File filesDir) {
+    public FilesGenerator(File filesDir, int filesCount) {
         this.filesDir = filesDir;
+        this.filesCount = filesCount;
     }
 
     public List<File> generateFiles() throws IOException {
 
         List<File> files = new ArrayList<>();
-        for(int i = 0; i < FILES_COUNT; ++i) {
+        for(int i = 0; i < filesCount; ++i) {
             String fileName = FILENAME_BASE + i + EXTENSION;
             File file = new File(filesDir, fileName);
             if(!file.exists()) {
